@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
-import shortid from 'shortid';
+import { useSelector, useDispatch } from "react-redux";
+import { addContact, deleteContact } from "./redux/contacts/contacts-actions";
+import filterAction from "./redux/filter/filter-actions";
 
-import style from './App.module.css';
+import shortid from "shortid";
 
-import ContactForm from './components/ContactForm';
-import ContactList from './components/ContactList';
-import Filter from './components/Filter';
+import style from "./App.module.css";
+
+import ContactForm from "./components/ContactForm";
+import ContactList from "./components/ContactList";
+import Filter from "./components/Filter";
 
 function App() {
   //   contacts: [
@@ -15,27 +18,12 @@ function App() {
   //     // { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
   //   ]
 
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
-
-  useEffect(() => {
-    const contacts = JSON.parse(localStorage.getItem('contacts'));
-
-    if (contacts) {
-      setContacts(contacts);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (contacts === '') {
-      return;
-    }
-
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  const dispatch = useDispatch();
+  const contactsList = useSelector((state) => state.contacts.items);
+  const inputValueFilter = useSelector((state) => state.contacts.filter);
 
   const addContacts = ({ name, number }) => {
-    if (contacts.some(contact => contact.name === name)) {
+    if (contactsList.some((contact) => contact.name === name)) {
       alert(`${name} is already in contacts`);
       return;
     }
@@ -46,35 +34,29 @@ function App() {
       number,
     };
 
-    setContacts(prevContacts => [contact, ...prevContacts]);
+    dispatch(addContact(contact));
   };
 
-  const filterHendler = ({ target }) => {
-    setFilter(target.value);
-  };
+  const filterHendler = ({ target }) => dispatch(filterAction(target.value));
 
   const filterContacts = () => {
-    const normalizedFilter = filter.toLocaleLowerCase();
+    const normalizedFilter = inputValueFilter.toLocaleLowerCase();
 
-    return contacts.filter(contact =>
-      contact.name.toLocaleLowerCase().includes(normalizedFilter),
+    return contactsList.filter((contact) =>
+      contact.name.toLocaleLowerCase().includes(normalizedFilter)
     );
   };
 
-  const deleteContact = ({ target }) => {
-    const { id } = target;
-    setContacts(prevContacts =>
-      prevContacts.filter(contact => contact.id !== id),
-    );
-  };
+  const deleteContactFromId = ({ target }) =>
+    dispatch(deleteContact(target.id));
 
   return (
     <div className={style.container}>
       <h2>Phonebook</h2>
       <ContactForm onSubmit={addContacts} />
       <h2>Contacts</h2>
-      <Filter filter={filter} onChange={filterHendler} />
-      <ContactList contacts={filterContacts()} onDelete={deleteContact} />
+      <Filter filter={inputValueFilter} onChange={filterHendler} />
+      <ContactList contacts={filterContacts()} onDelete={deleteContactFromId} />
     </div>
   );
 }

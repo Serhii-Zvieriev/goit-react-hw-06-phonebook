@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import style from './ContactForm.module.scss';
+import style from "./ContactForm.module.scss";
 
 function ContactForm({ onSubmit }) {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
 
   const handleChangeName = ({ target }) => {
     setName(target.value);
@@ -13,7 +13,7 @@ function ContactForm({ onSubmit }) {
     setNumber(target.value);
   };
 
-  const handleSubmit = event => {
+  const handleSubmit = (event) => {
     event.preventDefault();
 
     onSubmit({ name, number });
@@ -21,8 +21,8 @@ function ContactForm({ onSubmit }) {
   };
 
   const resetForm = () => {
-    setName('');
-    setNumber('');
+    setName("");
+    setNumber("");
   };
 
   return (
