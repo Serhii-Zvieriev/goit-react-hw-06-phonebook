@@ -1,8 +1,13 @@
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import shortid from "shortid";
+
+import { addContact } from "../../redux/contacts/contacts-actions";
+import { getContactsList } from "../../redux/contacts/contacts-selectors";
 
 import style from "./ContactForm.module.scss";
 
-function ContactForm({ onSubmit }) {
+function ContactForm() {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
 
@@ -13,16 +18,34 @@ function ContactForm({ onSubmit }) {
     setNumber(target.value);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    onSubmit({ name, number });
-    resetForm();
-  };
-
   const resetForm = () => {
     setName("");
     setNumber("");
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    addContacts({ name, number });
+    resetForm();
+  };
+
+  const dispatch = useDispatch();
+  const contactsList = useSelector(getContactsList);
+
+  const addContacts = ({ name, number }) => {
+    if (contactsList.some((contact) => contact.name === name)) {
+      alert(`${name} is already in contacts`);
+      return;
+    }
+
+    const contact = {
+      id: shortid.generate(),
+      name,
+      number,
+    };
+
+    dispatch(addContact(contact));
   };
 
   return (

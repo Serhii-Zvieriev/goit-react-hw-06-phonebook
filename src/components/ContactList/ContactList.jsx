@@ -1,6 +1,17 @@
-import style from './ContactList.module.scss';
+import { useSelector, useDispatch } from "react-redux";
+import { deleteContact } from "../../redux/contacts/contacts-actions";
+import { getFilteredContacts } from "../../redux/contacts/contacts-selectors";
 
-function ContactList({ contacts, onDelete }) {
+import style from "./ContactList.module.scss";
+
+function ContactList() {
+  const dispatch = useDispatch();
+
+  const deleteContactFromId = ({ target }) =>
+    dispatch(deleteContact(target.id));
+
+  const contacts = useSelector(getFilteredContacts);
+
   return (
     <ul className={style.list}>
       {contacts.map(({ id, name, number }) => (
@@ -8,7 +19,11 @@ function ContactList({ contacts, onDelete }) {
           <p>
             {name}: {number}
           </p>
-          <button id={id} onClick={onDelete} className={style.button}>
+          <button
+            id={id}
+            onClick={deleteContactFromId}
+            className={style.button}
+          >
             Delete
           </button>
         </li>
